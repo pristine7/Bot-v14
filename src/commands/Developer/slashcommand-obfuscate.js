@@ -3,29 +3,29 @@ const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 module.exports = new ApplicationCommand({
-    command: {
-        name: 'obfuscate',
-        description: 'Obfuscate Lua File.',
-        type: 1,
-        options: [{
-            name: 'file',
-            description: 'Lua file to obfuscated.',
-            type: ApplicationCommandOptionType.Attachment,
-            required: true
+  command: {
+    name: 'obfuscate',
+    description: 'Obfuscate Lua File.',
+    type: 1,
+    options: [{
+      name: 'file',
+      description: 'Lua file to obfuscated.',
+      type: ApplicationCommandOptionType.Attachment,
+      required: true
         }]
-    },
-    options: {
-        botOwner: true
-    },
-    /**
-     * 
-     * @param {DiscordBot} client 
-     * @param {ChatInputCommandInteraction} interaction 
-     */
-    run: async (client, interaction) => {
-        await interaction.deferReply();
+  },
+  options: {
+    botOwner: true
+  },
+  /**
+   * 
+   * @param {DiscordBot} client 
+   * @param {ChatInputCommandInteraction} interaction 
+   */
+  run: async (client, interaction) => {
+    await interaction.deferReply();
 
-        const file = interaction.options.getAttachment("file");
+    const file = interaction.options.getAttachment("file");
     const key = "pr1s";
 
     if (!file.name.endsWith(".lua") && !file.name.endsWith(".txt")) {
@@ -72,7 +72,7 @@ module.exports = new ApplicationCommand({
 
     // Send the obfuscated file back to the user
     //const attachment = new MessageAttachment(obfuscatedFilePath);
-    
+
     await interaction.editReply({
       content: "Here is your obfuscated Lua script:",
       files: [
@@ -82,5 +82,5 @@ module.exports = new ApplicationCommand({
 
     // Clean up the saved file
     fs.unlinkSync(obfuscatedFilePath);
-    }
+  }
 }).toJSON();
