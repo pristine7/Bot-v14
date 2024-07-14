@@ -1,6 +1,9 @@
 const { ChatInputCommandInteraction, ApplicationCommandOptionType, AttachmentBuilder } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
 module.exports = new ApplicationCommand({
   command: {
@@ -9,10 +12,10 @@ module.exports = new ApplicationCommand({
     type: 1,
     options: [{
       name: 'file',
-      description: 'Lua file to obfuscated.',
+      description: 'Lua file to obfuscate.',
       type: ApplicationCommandOptionType.Attachment,
       required: true
-        }]
+    }]
   },
   options: {
     botOwner: true
@@ -35,7 +38,6 @@ module.exports = new ApplicationCommand({
       });
     }
 
-    const filePath = path.join(__dirname, file.name);
     const response = await fetch(file.url);
     const fileData = await response.text();
 
@@ -66,21 +68,12 @@ module.exports = new ApplicationCommand({
 
     const obfuscatedScript = `${templateE}local function decrypt(t) local s = ""; for i = 1, #t do local c = t[i] - key:byte((i - 1) % #key + 1); s = s .. string.char(c); end; return s; end; local encrypted = {${encryptedScript.join(",")}}; local decrypted = decrypt(encrypted); load(decrypted)()`;
 
-    // Save the obfuscated script to a file
-    const obfuscatedFilePath = path.join(__dirname, `Enc_${file.name}`);
-    fs.writeFileSync(obfuscatedFilePath, obfuscatedScript);
-
-    // Send the obfuscated file back to the user
-    //const attachment = new MessageAttachment(obfuscatedFilePath);
-
+    // Send the obfuscated script back to the user
     await interaction.editReply({
       content: "Here is your obfuscated Lua script:",
       files: [
-        new AttachmentBuilder(Buffer.from(`${obfuscatedScript}`, 'utf-8'), { name: `Enc_${file.name}` })
+        new AttachmentBuilder(Buffer.from(obfuscatedScript, 'utf-8'), { name: `Enc_${file.name}` })
       ]
     });
-
-    // Clean up the saved file
-    fs.unlinkSync(obfuscatedFilePath);
   }
 }).toJSON();
